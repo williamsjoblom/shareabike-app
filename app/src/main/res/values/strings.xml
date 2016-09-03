@@ -1,3 +1,4 @@
 <resources>
     <string name="app_name">Share a Bike</string>
+    <string name="title_activity_maps">Map</string>
 </resources>
