@@ -30,7 +30,7 @@ public class BikeAdapter extends ArrayAdapter<Bike> {
         TextView distanceText = (TextView) convertView.findViewById(R.id.bikeDistanceText);
 
         nameText.setText(bike.getName());
-        distanceText.setText(String.format(Locale.US, "%f", bike.getDistance()));
+        distanceText.setText(String.format(Locale.US, "%.1fkm", bike.getDistance() / 1000));
 
         return convertView;
     }
