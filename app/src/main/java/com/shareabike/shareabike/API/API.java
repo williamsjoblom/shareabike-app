@@ -17,7 +17,6 @@ import java.util.ArrayList;
  * Created by wax on 9/3/16.
  */
 public class API {
-
     private final static String API_URL = "http://138.68.129.101/api/";
 
     private static API instance;
@@ -30,7 +29,7 @@ public class API {
 
     private API() { }
 
-    public static void read(String path, OnReadCallback callback) {
+    public static String read(String path) {
         try {
             URL url = new URL(API_URL + path);
 
@@ -43,50 +42,11 @@ public class API {
             }
 
             in.close();
-            callback.onRead(builder.toString());
+            return builder.toString();
         } catch (Exception ex) {
             Log.e("wax", "API read error");
         }
+
+        return null;
     }
-
-    public static void getBikes(final OnBikesCallback callback) {
-        read("bikes", new OnReadCallback() {
-            @Override
-            public void onRead(String data) {
-                ArrayList<Bike> bikes = new ArrayList<>();
-
-                try {
-                    JSONArray jsonBikes = new JSONArray(data);
-
-                    for (int i = 0; i < jsonBikes.length(); i++) {
-                        JSONObject o = jsonBikes.getJSONObject(i);
-                        bikes.add(new Bike(o));
-                    }
-                } catch (JSONException e) {
-                    e.printStackTrace();
-                }
-                callback.onBikes(bikes);
-            }
-        });
-    }
-
-    public static void getBike(int id, final OnBikeCallback callback) {
-        read("bike/" + id, new OnReadCallback() {
-            @Override
-            public void onRead(String data) {
-                try {
-                    JSONObject jsonBike = new JSONObject(data);
-                    callback.onBike(new Bike(jsonBike));
-                } catch (JSONException e) {
-                    e.printStackTrace();
-                }
-
-            }
-        });
-    }
-
-
-
-
-
 }

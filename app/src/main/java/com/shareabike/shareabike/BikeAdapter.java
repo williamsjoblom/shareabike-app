@@ -29,8 +29,8 @@ public class BikeAdapter extends ArrayAdapter<Bike> {
             convertView = LayoutInflater.from(getContext()).inflate(R.layout.item_bike, parent, false);
         }
 
-        TextView nameText = (TextView) convertView.findViewById(R.id.bikeNameText);
-        TextView distanceText = (TextView) convertView.findViewById(R.id.bikeDistanceText);
+        TextView nameText = (TextView) convertView.findViewById(R.id.bike_name_text);
+        TextView distanceText = (TextView) convertView.findViewById(R.id.bike_distance_text);
         ImageView bikeImage = (ImageView) convertView.findViewById(R.id.bike_img);
 
         nameText.setText(bike.getName());

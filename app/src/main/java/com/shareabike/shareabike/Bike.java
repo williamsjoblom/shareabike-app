@@ -2,6 +2,7 @@ package com.shareabike.shareabike;
 
 import android.location.Location;
 import android.location.LocationManager;
+import android.location.LocationProvider;
 import android.util.Log;
 
 import com.google.android.gms.maps.model.LatLng;
@@ -12,6 +13,7 @@ import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.io.Serializable;
+import java.util.ArrayList;
 
 /**
  * Created by wax on 9/3/16.
@@ -21,41 +23,30 @@ public class Bike implements Serializable {
     private int owner;
     private String name;
     private String imageURL;
-    private Location location;
+    private ArrayList<Location> locations;
     private Marker marker;
 
-    public Bike(String name) {
-        this.id = 0;
-        this.owner = 0;
-        this.name = name;
-
-        // Placeholder location pointing at campus Valla.
-        this.location = new Location(LocationManager.GPS_PROVIDER);
-        this.location.setLatitude(58.3978364);
-        this.location.setLongitude(15.5760072);
-    }
-
-    public Bike(String name, Location location) {
-        this.id = 0;
-        this.owner = 0;
-        this.name = name;
-        this.location = location;
-    }
 
     public Bike(JSONObject o) {
+        locations = new ArrayList<>();
+
         try {
             id = o.getInt("id");
             name = o.getString("bike_name");
             owner = o.getInt("owner");
             imageURL = o.getString("image_url");
 
-            JSONObject positionJson = o.getJSONArray("positions").getJSONObject(0);
+            JSONArray positionsJson = o.getJSONArray("positions");
 
-            // Placeholder location pointing at campus Valla.
-            this.location = new Location(LocationManager.GPS_PROVIDER);
-            this.location.setLatitude(positionJson.getDouble("lat"));
-            this.location.setLongitude(positionJson.getDouble("lon"));
+            for (int i = 0; i < positionsJson.length(); i++) {
+                JSONObject positionJson = positionsJson.getJSONObject(i);
 
+                Location location = new Location(LocationManager.GPS_PROVIDER);
+                location.setLatitude(positionJson.getDouble("lat"));
+                location.setLongitude(positionJson.getDouble("lon"));
+
+                locations.add(location);
+            }
         } catch (JSONException e) {
             Log.e("wax", "JSON error");
         }
@@ -67,14 +58,6 @@ public class Bike implements Serializable {
 
     public Marker getMarker() { return marker; }
 
-    public void move(Location to) {
-        this.location = to;
-
-        if (marker != null) {
-            marker.setPosition(new LatLng(to.getLatitude(), to.getLongitude()));
-        }
-    }
-
     public String getName() {
         return name;
     }
@@ -85,14 +68,29 @@ public class Bike implements Serializable {
 
     public float getDistance() {
         GPSManager manager = GPSManager.getInstance();
-        return manager.getLocation().distanceTo(location);
+        return manager.getLocation().distanceTo(getLocation());
     }
 
+    public Location getLocation() {
+        if (locations.isEmpty())
+            return new Location(LocationManager.GPS_PROVIDER);
+
+        return locations.get(0);
+    }
+
+    public ArrayList<Location> getLocations() { return locations; }
+
     public double getLat() {
-        return location.getLatitude();
+        if (locations.isEmpty())
+            return 0;
+
+        return locations.get(0).getLatitude();
     }
 
     public double getLong() {
-        return location.getLongitude();
+        if (locations.isEmpty())
+            return 0;
+
+        return locations.get(0).getLongitude();
     }
 }

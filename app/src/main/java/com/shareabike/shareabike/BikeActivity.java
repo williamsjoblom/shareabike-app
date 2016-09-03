@@ -1,5 +1,6 @@
 package com.shareabike.shareabike;
 
+import android.app.Activity;
 import android.content.Intent;
 import android.support.v7.app.ActionBar;
 import android.support.v7.app.AppCompatActivity;
@@ -10,11 +11,10 @@ import android.view.MenuItem;
 import android.widget.ImageView;
 import android.widget.TextView;
 
-import com.shareabike.shareabike.API.API;
-import com.shareabike.shareabike.API.OnBikeCallback;
+import com.shareabike.shareabike.API.GetBikeTask;
 import com.squareup.picasso.Picasso;
 
-public class BikeActivity extends AppCompatActivity implements OnBikeCallback {
+public class BikeActivity extends AppCompatActivity {
 
     private int id;
     private Bike bike;
@@ -30,19 +30,21 @@ public class BikeActivity extends AppCompatActivity implements OnBikeCallback {
         Intent intent = getIntent();
         id = intent.getIntExtra("id", 0);
 
-        API.getBike(id, this);
-    }
+        final Activity context = this;
+        new GetBikeTask(id) {
+            @Override
+            protected void onPostExecute(Bike b) {
+                bike = b;
 
-    @Override
-    public void onBike(Bike bike) {
-        this.bike = bike;
+                ImageView imageView = (ImageView) findViewById(R.id.dialog_image);
+                TextView nameText = (TextView) findViewById(R.id.bike_name);
 
-        ImageView imageView = (ImageView) findViewById(R.id.dialog_image);
-        TextView nameText = (TextView) findViewById(R.id.bike_name);
+                nameText.setText(bike.getName());
+                if (!bike.getImageURL().isEmpty())
+                    Picasso.with(context).load(bike.getImageURL()).into(imageView);
+            }
+        }.execute();
 
-        nameText.setText(bike.getName());
-        if (!bike.getImageURL().isEmpty())
-            Picasso.with(this).load(bike.getImageURL()).into(imageView);
     }
 
     @Override

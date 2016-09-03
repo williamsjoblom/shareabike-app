@@ -6,6 +6,7 @@ import android.location.Location;
 import android.view.View;
 import android.widget.AdapterView;
 import android.widget.ListView;
+import android.widget.TextView;
 
 import com.google.android.gms.maps.CameraUpdate;
 import com.google.android.gms.maps.CameraUpdateFactory;
@@ -17,7 +18,9 @@ import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.MarkerOptions;
 
+import com.google.android.gms.maps.model.PolylineOptions;
 import com.shareabike.shareabike.API.API;
+import com.shareabike.shareabike.API.GetBikesTask;
 import com.shareabike.shareabike.API.OnBikesCallback;
 import com.sothree.slidinguppanel.SlidingUpPanelLayout;
 
@@ -29,12 +32,12 @@ import java.util.ArrayList;
  */
 public class BikeViewManager implements OnMapReadyCallback, OnBikesCallback, AdapterView.OnItemClickListener, OnMarkerClickListener {
 
-    private static final float FOCUS_ZOOM = 16;
+    private static final float FOCUS_ZOOM = 17;
 
     private Activity context;
 
     private SupportMapFragment mapFragment;
-    private ListView listView;
+    final private ListView listView;
     private SlidingUpPanelLayout slide;
 
     private GoogleMap map;
@@ -42,19 +45,32 @@ public class BikeViewManager implements OnMapReadyCallback, OnBikesCallback, Ada
     private ArrayList<Bike> bikes;
     private BikeAdapter listAdapter;
 
-    private boolean hasMarkers = false;
-
-    public BikeViewManager(Activity context, SlidingUpPanelLayout slide, SupportMapFragment mapFragment, ListView listView) {
+    public BikeViewManager(Activity context, SlidingUpPanelLayout s, SupportMapFragment mf, ListView l) {
         this.context = context;
 
-        this.mapFragment = mapFragment;
-        this.listView = listView;
-        this.slide = slide;
+        this.mapFragment = mf;
+        this.listView = l;
+        this.slide = s;
 
         listView.setOnItemClickListener(this);
 
         final OnBikesCallback callback = this;
-        API.getBikes(callback);
+
+        new GetBikesTask() {
+            @Override
+            protected void onPostExecute(ArrayList<Bike> b) {
+                map.clear();
+
+                bikes = b;
+
+                listAdapter = new BikeAdapter(listView.getContext(), bikes);
+                listView.setAdapter(listAdapter);
+
+                addMarkers();
+            }
+        }.execute();
+
+        //API.getBikes(callback);
     }
 
     public void onCreate() {
@@ -75,49 +91,54 @@ public class BikeViewManager implements OnMapReadyCallback, OnBikesCallback, Ada
 
         map.setMyLocationEnabled(true);
 
-        if (!hasMarkers)
-            addMarkers();
+        addMarkers();
     }
 
     @Override
     public void onBikes(ArrayList<Bike> bikes) {
+        map.clear();
+
         this.bikes = bikes;
 
         listAdapter = new BikeAdapter(listView.getContext(), bikes);
         listView.setAdapter(listAdapter);
 
-        if (!hasMarkers)
-            addMarkers();
+        addMarkers();
     }
 
     private void addMarkers() {
         if (map == null || bikes == null)
             return;
 
-        hasMarkers = true;
-
         for (Bike bike : bikes) {
-            LatLng location = new LatLng(bike.getLat(), bike.getLong());
-            MarkerOptions options = new MarkerOptions().position(location);
-
-            Marker marker = map.addMarker(options);
-            marker.setTag(bike);
-            bike.setMarker(marker);
+            addMarker(bike);
         }
+    }
+
+    private void addMarker(Bike bike) {
+        addMarker(bike, false);
+    }
+
+    private void addMarker(Bike bike, boolean drawBikePath) {
+        if (map == null)
+            return;
+
+        LatLng location = new LatLng(bike.getLat(), bike.getLong());
+        MarkerOptions options = new MarkerOptions().position(location);
+
+        Marker marker = map.addMarker(options);
+        marker.setTag(bike);
+        bike.setMarker(marker);
+
+        if(drawBikePath)
+            drawPath(bike);
     }
 
     @Override
     public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
         if (map == null) return;
-
         Bike bike = bikes.get(position);
-
         startBikeActivity(bike);
-
-        /*
-        LatLng latlng = new LatLng(bike.getLat(), bike.getLong());
-        CameraUpdate update = CameraUpdateFactory.newLatLngZoom(latlng, FOCUS_ZOOM);
-        map.animateCamera(update);*/
     }
 
     @Override
@@ -134,8 +155,59 @@ public class BikeViewManager implements OnMapReadyCallback, OnBikesCallback, Ada
     }
 
     public void showOnMap(Bike bike) {
+        map.clear();
+
+        addMarker(bike);
+
+        LatLng latlng = new LatLng(bike.getLat(), bike.getLong());
+        CameraUpdate update = CameraUpdateFactory.newLatLngZoom(latlng, FOCUS_ZOOM);
+        map.animateCamera(update);
+
         View view = context.findViewById(R.id.bike_selected_view);
         view.setVisibility(View.VISIBLE);
+
+        TextView selectedBikeText = (TextView) context.findViewById(R.id.selected_bike_text);
+        selectedBikeText.setText(bike.getName());
+
         slide.setPanelState(SlidingUpPanelLayout.PanelState.COLLAPSED);
+        slide.setTouchEnabled(false);
+
+        View clearSelected = context.findViewById(R.id.clear_selected_bike);
+        clearSelected.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                unShowOnMap();
+            }
+        });
+    }
+
+    public void drawPath(Bike bike) {
+        ArrayList<Location> locations = bike.getLocations();
+
+        if(locations.size() < 2) return;
+
+        PolylineOptions line = new PolylineOptions();
+
+        LatLng p0 = new LatLng(locations.get(0).getLatitude(), locations.get(0).getLongitude());
+
+        for(int i = 1; i < locations.size(); i++) {
+            Location l1 = locations.get(i);
+            LatLng p1 = new LatLng(l1.getLatitude(), l1.getLongitude());
+
+            line.add(p0, p1);
+            p0 = p1;
+        }
+
+        map.addPolyline(line);
+    }
+
+    public void unShowOnMap() {
+        map.clear();
+
+        View view = context.findViewById(R.id.bike_selected_view);
+        view.setVisibility(View.GONE);
+        slide.setTouchEnabled(true);
+
+        addMarkers();
     }
 }
