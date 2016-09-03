@@ -10,7 +10,7 @@ import com.google.android.gms.maps.SupportMapFragment;
 public class BikeManager implements OnMapReadyCallback {
 
     public BikeManager(SupportMapFragment map) {
-        
+
     }
 
     @Override
