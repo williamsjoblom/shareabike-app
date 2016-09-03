@@ -18,6 +18,7 @@ public class Bike {
     private int id;
     private int owner;
     private String name;
+    private String imageURL;
     private Location location;
     private Marker marker;
 
@@ -44,6 +45,7 @@ public class Bike {
             id = o.getInt("id");
             name = o.getString("bike_name");
             owner = o.getInt("owner");
+            imageURL = o.getString("image_url");
 
             JSONObject positionJson = o.getJSONArray("positions").getJSONObject(0);
 
@@ -61,6 +63,8 @@ public class Bike {
         this.marker = marker;
     }
 
+    public Marker getMarker() { return marker; }
+
     public void move(Location to) {
         this.location = to;
 
@@ -72,6 +76,8 @@ public class Bike {
     public String getName() {
         return name;
     }
+
+    public String getImageURL() { return imageURL; }
 
     public float getDistance() {
         GPSManager manager = GPSManager.getInstance();

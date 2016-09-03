@@ -5,7 +5,10 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ArrayAdapter;
+import android.widget.ImageView;
 import android.widget.TextView;
+
+import com.squareup.picasso.Picasso;
 
 import java.util.ArrayList;
 import java.util.Locale;
@@ -28,9 +31,13 @@ public class BikeAdapter extends ArrayAdapter<Bike> {
 
         TextView nameText = (TextView) convertView.findViewById(R.id.bikeNameText);
         TextView distanceText = (TextView) convertView.findViewById(R.id.bikeDistanceText);
+        ImageView bikeImage = (ImageView) convertView.findViewById(R.id.bike_image);
 
         nameText.setText(bike.getName());
         distanceText.setText(String.format(Locale.US, "%.1fkm", bike.getDistance() / 1000));
+
+        if (!bike.getImageURL().isEmpty())
+            Picasso.with(this.getContext()).load(bike.getImageURL()).into(bikeImage);
 
         return convertView;
     }

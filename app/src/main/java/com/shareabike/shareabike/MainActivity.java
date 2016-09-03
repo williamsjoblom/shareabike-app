@@ -25,7 +25,7 @@ public class MainActivity extends AppCompatActivity {
                 .findFragmentById(R.id.map);
         ListView bikeList = (ListView) findViewById(R.id.bike_list);
 
-        BikeManager bikeManager = new BikeManager(mapFragment, bikeList);
-        bikeManager.onCreate();
+        BikeViewManager bikeViewManager = new BikeViewManager(mapFragment, bikeList);
+        bikeViewManager.onCreate();
     }
 }
