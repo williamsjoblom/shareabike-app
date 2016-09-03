@@ -31,7 +31,7 @@ public class BikeAdapter extends ArrayAdapter<Bike> {
 
         TextView nameText = (TextView) convertView.findViewById(R.id.bikeNameText);
         TextView distanceText = (TextView) convertView.findViewById(R.id.bikeDistanceText);
-        ImageView bikeImage = (ImageView) convertView.findViewById(R.id.bike_image);
+        ImageView bikeImage = (ImageView) convertView.findViewById(R.id.bike_img);
 
         nameText.setText(bike.getName());
         distanceText.setText(String.format(Locale.US, "%.1fkm", bike.getDistance() / 1000));

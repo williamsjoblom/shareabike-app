@@ -1,7 +1,8 @@
 package com.shareabike.shareabike;
 
+import android.app.Activity;
+import android.content.Intent;
 import android.location.Location;
-import android.util.Log;
 import android.view.View;
 import android.widget.AdapterView;
 import android.widget.ListView;
@@ -9,14 +10,16 @@ import android.widget.ListView;
 import com.google.android.gms.maps.CameraUpdate;
 import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
+import com.google.android.gms.maps.GoogleMap.OnMarkerClickListener;
 import com.google.android.gms.maps.OnMapReadyCallback;
 import com.google.android.gms.maps.SupportMapFragment;
-import com.google.android.gms.maps.model.CameraPosition;
 import com.google.android.gms.maps.model.LatLng;
+import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.MarkerOptions;
 
 import com.shareabike.shareabike.API.API;
 import com.shareabike.shareabike.API.OnBikesCallback;
+import com.sothree.slidinguppanel.SlidingUpPanelLayout;
 
 
 import java.util.ArrayList;
@@ -24,12 +27,16 @@ import java.util.ArrayList;
 /**
  * Created by wax on 9/3/16.
  */
-public class BikeViewManager implements OnMapReadyCallback, OnBikesCallback, AdapterView.OnItemClickListener {
+public class BikeViewManager implements OnMapReadyCallback, OnBikesCallback, AdapterView.OnItemClickListener, OnMarkerClickListener {
 
     private static final float FOCUS_ZOOM = 16;
 
+    private Activity context;
+
     private SupportMapFragment mapFragment;
     private ListView listView;
+    private SlidingUpPanelLayout slide;
+
     private GoogleMap map;
 
     private ArrayList<Bike> bikes;
@@ -37,9 +44,12 @@ public class BikeViewManager implements OnMapReadyCallback, OnBikesCallback, Ada
 
     private boolean hasMarkers = false;
 
-    public BikeViewManager(SupportMapFragment mapFragment, ListView listView) {
+    public BikeViewManager(Activity context, SlidingUpPanelLayout slide, SupportMapFragment mapFragment, ListView listView) {
+        this.context = context;
+
         this.mapFragment = mapFragment;
         this.listView = listView;
+        this.slide = slide;
 
         listView.setOnItemClickListener(this);
 
@@ -56,6 +66,7 @@ public class BikeViewManager implements OnMapReadyCallback, OnBikesCallback, Ada
         map = googleMap;
 
         map.setMinZoomPreference(11);
+        map.setOnMarkerClickListener(this);
 
         Location l = GPSManager.getInstance().getLocation();
         LatLng latlng = new LatLng(l.getLatitude(), l.getLongitude());
@@ -88,7 +99,10 @@ public class BikeViewManager implements OnMapReadyCallback, OnBikesCallback, Ada
         for (Bike bike : bikes) {
             LatLng location = new LatLng(bike.getLat(), bike.getLong());
             MarkerOptions options = new MarkerOptions().position(location);
-            bike.setMarker(map.addMarker(options));
+
+            Marker marker = map.addMarker(options);
+            marker.setTag(bike);
+            bike.setMarker(marker);
         }
     }
 
@@ -98,9 +112,30 @@ public class BikeViewManager implements OnMapReadyCallback, OnBikesCallback, Ada
 
         Bike bike = bikes.get(position);
 
+        startBikeActivity(bike);
+
+        /*
         LatLng latlng = new LatLng(bike.getLat(), bike.getLong());
         CameraUpdate update = CameraUpdateFactory.newLatLngZoom(latlng, FOCUS_ZOOM);
-        map.animateCamera(update);
+        map.animateCamera(update);*/
     }
 
+    @Override
+    public boolean onMarkerClick(Marker marker) {
+        Bike bike = (Bike)marker.getTag();
+        startBikeActivity(bike);
+        return false;
+    }
+
+    public void startBikeActivity(Bike bike) {
+        Intent intent = new Intent(context, BikeActivity.class);
+        intent.putExtra("id", bike.getID());
+        context.startActivity(intent);
+    }
+
+    public void showOnMap(Bike bike) {
+        View view = context.findViewById(R.id.bike_selected_view);
+        view.setVisibility(View.VISIBLE);
+        slide.setPanelState(SlidingUpPanelLayout.PanelState.COLLAPSED);
+    }
 }

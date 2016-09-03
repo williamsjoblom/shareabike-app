@@ -1,14 +1,17 @@
 package com.shareabike.shareabike;
 
 import android.os.StrictMode;
+import android.support.v4.app.DialogFragment;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.widget.ListView;
 
 import com.google.android.gms.maps.SupportMapFragment;
+import com.sothree.slidinguppanel.SlidingUpPanelLayout;
 
 public class MainActivity extends AppCompatActivity {
 
+    private static BikeViewManager bikeViewManager;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -21,11 +24,16 @@ public class MainActivity extends AppCompatActivity {
 
         GPSManager.getInstance().onCreate(this);
 
+        SlidingUpPanelLayout slide = (SlidingUpPanelLayout)  findViewById(R.id.sliding_layout);
         SupportMapFragment mapFragment = (SupportMapFragment) getSupportFragmentManager()
                 .findFragmentById(R.id.map);
         ListView bikeList = (ListView) findViewById(R.id.bike_list);
 
-        BikeViewManager bikeViewManager = new BikeViewManager(mapFragment, bikeList);
+        bikeViewManager = new BikeViewManager(this, slide, mapFragment, bikeList);
         bikeViewManager.onCreate();
+    }
+
+    public static BikeViewManager getBikeViewManager() {
+        return bikeViewManager;
     }
 }

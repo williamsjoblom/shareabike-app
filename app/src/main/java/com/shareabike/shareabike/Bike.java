@@ -11,10 +11,12 @@ import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import java.io.Serializable;
+
 /**
  * Created by wax on 9/3/16.
  */
-public class Bike {
+public class Bike implements Serializable {
     private int id;
     private int owner;
     private String name;
@@ -76,6 +78,8 @@ public class Bike {
     public String getName() {
         return name;
     }
+
+    public int getID() { return id; }
 
     public String getImageURL() { return imageURL; }
 
