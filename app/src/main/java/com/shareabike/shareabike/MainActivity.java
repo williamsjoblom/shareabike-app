@@ -11,6 +11,8 @@ import com.sothree.slidinguppanel.SlidingUpPanelLayout;
 
 public class MainActivity extends AppCompatActivity {
 
+    public static final int USER_ID = 1; // ERIK!
+
     private static BikeViewManager bikeViewManager;
 
     @Override
@@ -18,9 +20,9 @@ public class MainActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
-        // Required for network on main thread. Soon to be removed.
-        StrictMode.ThreadPolicy policy = new StrictMode.ThreadPolicy.Builder().permitAll().build();
-        StrictMode.setThreadPolicy(policy);
+        // Required for network on main thread. Soon to be removed. (Or)
+        //StrictMode.ThreadPolicy policy = new StrictMode.ThreadPolicy.Builder().permitAll().build();
+        //StrictMode.setThreadPolicy(policy);
 
         GPSManager.getInstance().onCreate(this);
 

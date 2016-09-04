@@ -1,5 +1,7 @@
 package com.shareabike.shareabike.API;
 
+import android.util.Log;
+
 import com.shareabike.shareabike.Bike;
 
 import org.json.JSONArray;
@@ -11,9 +13,9 @@ import java.util.ArrayList;
 /**
  * Created by wax on 9/3/16.
  */
-public abstract class GetBikesTask extends ScheduledAsyncTask<Void, Void, ArrayList<Bike>> {
+public abstract class GetBikesTask extends NiceAsyncTask<Void, ArrayList<Bike>> {
     @Override
-    protected ArrayList<Bike> doInBackground(Void... params) {
+    protected ArrayList<Bike> doInBackground(Object... params) {
         String data = API.read("bikes");
 
         ArrayList<Bike> bikes = new ArrayList<>();
@@ -25,7 +27,7 @@ public abstract class GetBikesTask extends ScheduledAsyncTask<Void, Void, ArrayL
                 bikes.add(new Bike(o));
             }
         } catch (JSONException e) {
-            e.printStackTrace();
+            Log.e("wax", "JSON err: " + e.toString());
         }
 
         return bikes;

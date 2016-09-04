@@ -8,14 +8,17 @@ import android.os.Bundle;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
+import android.view.View;
+import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.TextView;
 
+import com.shareabike.shareabike.API.BorrowTask;
 import com.shareabike.shareabike.API.GetBikeTask;
+import com.shareabike.shareabike.API.GetBorrowedTask;
 import com.squareup.picasso.Picasso;
 
 public class BikeActivity extends AppCompatActivity {
-
     private int id;
     private Bike bike;
 
@@ -30,6 +33,7 @@ public class BikeActivity extends AppCompatActivity {
         Intent intent = getIntent();
         id = intent.getIntExtra("id", 0);
 
+        //////// UGLY CODE AHEAD, BEWARE!!!!
         final Activity context = this;
         new GetBikeTask(id) {
             @Override
@@ -42,9 +46,58 @@ public class BikeActivity extends AppCompatActivity {
                 nameText.setText(bike.getName());
                 if (!bike.getImageURL().isEmpty())
                     Picasso.with(context).load(bike.getImageURL()).into(imageView);
+
+                final Button borrowButton = (Button) findViewById(R.id.borrow_button);
+
+                if (bike.getOwner() != MainActivity.USER_ID) {
+                    if (bike.getRentedBy() != 0 && bike.getRentedBy() != MainActivity.USER_ID) {
+                        // Unavailable
+                    } else if (bike.getRentedBy() == MainActivity.USER_ID) {
+                        // Borrowed
+                        setButtonReturn(borrowButton);
+                    } else {
+                        // Available
+                        new GetBorrowedTask(MainActivity.USER_ID) {
+                            @Override
+                            protected void onPostExecute(Integer result) {
+                                setButtonBorrow(borrowButton);
+                                if(result > 0)
+                                    borrowButton.setEnabled(false);
+                            }
+                        }.execute();
+                    }
+
+                }
             }
         }.execute();
+    }
 
+    private void setButtonBorrow(final Button borrowButton) {
+        borrowButton.setText("Borrow");
+
+        borrowButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                new BorrowTask(MainActivity.USER_ID, bike.getID(), true).execute();
+                setButtonReturn(borrowButton);
+            }
+        });
+
+        borrowButton.setVisibility(View.VISIBLE);
+    }
+
+    private void setButtonReturn(final Button borrowButton) {
+        borrowButton.setText("Return");
+
+        borrowButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                new BorrowTask(MainActivity.USER_ID, bike.getID(), false).execute();
+                setButtonBorrow(borrowButton);
+            }
+        });
+
+        borrowButton.setVisibility(View.VISIBLE);
     }
 
     @Override

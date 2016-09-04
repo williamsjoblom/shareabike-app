@@ -19,8 +19,10 @@ import java.util.ArrayList;
  * Created by wax on 9/3/16.
  */
 public class Bike implements Serializable {
+
     private int id;
     private int owner;
+    private int rentedBy;
     private String name;
     private String imageURL;
     private ArrayList<Location> locations;
@@ -36,6 +38,13 @@ public class Bike implements Serializable {
             owner = o.getInt("owner");
             imageURL = o.getString("image_url");
 
+            Object re = o.get("rented_by");
+
+            if(re instanceof Integer)
+                rentedBy = (Integer) re;
+            else
+                rentedBy = 0;
+
             JSONArray positionsJson = o.getJSONArray("positions");
 
             for (int i = 0; i < positionsJson.length(); i++) {
@@ -48,7 +57,7 @@ public class Bike implements Serializable {
                 locations.add(location);
             }
         } catch (JSONException e) {
-            Log.e("wax", "JSON error");
+            Log.e("wax", "JSON error!!! " + e.toString());
         }
     }
 
@@ -61,6 +70,8 @@ public class Bike implements Serializable {
     public String getName() {
         return name;
     }
+
+    public int getOwner() { return owner; }
 
     public int getID() { return id; }
 
@@ -93,4 +104,6 @@ public class Bike implements Serializable {
 
         return locations.get(0).getLongitude();
     }
+
+    public int getRentedBy() { return rentedBy; }
 }

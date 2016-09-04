@@ -5,12 +5,10 @@ import com.shareabike.shareabike.Bike;
 import org.json.JSONException;
 import org.json.JSONObject;
 
-import java.util.ArrayList;
-
 /**
  * Created by wax on 9/3/16.
  */
-public abstract class GetBikeTask extends ScheduledAsyncTask<Void, Void, Bike> {
+public abstract class GetBikeTask extends NiceAsyncTask<Void, Bike> {
 
     private final int id;
 
@@ -19,7 +17,7 @@ public abstract class GetBikeTask extends ScheduledAsyncTask<Void, Void, Bike> {
     }
 
     @Override
-    protected Bike doInBackground(Void... params) {
+    protected Bike doInBackground(Object... params) {
         try {
             String data = API.read("bike/" + id);
             JSONObject jsonBike = new JSONObject(data);

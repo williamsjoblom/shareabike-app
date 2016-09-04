@@ -32,6 +32,15 @@
 
     </LinearLayout>
 
+    <Button
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="Borrow"
+        android:visibility="invisible"
+        android:id="@+id/borrow_button"
+        android:background="@color/colorPrimary"
+        android:textColor="#FFFFFF"
+        android:layout_margin="8dp"/>
 
 
 </LinearLayout>

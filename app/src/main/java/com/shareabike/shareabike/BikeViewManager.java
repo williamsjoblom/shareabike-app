@@ -3,6 +3,8 @@ package com.shareabike.shareabike;
 import android.app.Activity;
 import android.content.Intent;
 import android.location.Location;
+import android.os.Handler;
+import android.util.Log;
 import android.view.View;
 import android.widget.AdapterView;
 import android.widget.ListView;
@@ -19,13 +21,14 @@ import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.MarkerOptions;
 
 import com.google.android.gms.maps.model.PolylineOptions;
-import com.shareabike.shareabike.API.API;
 import com.shareabike.shareabike.API.GetBikesTask;
 import com.shareabike.shareabike.API.OnBikesCallback;
 import com.sothree.slidinguppanel.SlidingUpPanelLayout;
 
 
 import java.util.ArrayList;
+import java.util.Timer;
+import java.util.TimerTask;
 
 /**
  * Created by wax on 9/3/16.
@@ -33,6 +36,7 @@ import java.util.ArrayList;
 public class BikeViewManager implements OnMapReadyCallback, OnBikesCallback, AdapterView.OnItemClickListener, OnMarkerClickListener {
 
     private static final float FOCUS_ZOOM = 17;
+    private static final long UPDATE_INTERVAL = 7000;
 
     private Activity context;
 
@@ -54,27 +58,50 @@ public class BikeViewManager implements OnMapReadyCallback, OnBikesCallback, Ada
 
         listView.setOnItemClickListener(this);
 
-        final OnBikesCallback callback = this;
-
         new GetBikesTask() {
             @Override
             protected void onPostExecute(ArrayList<Bike> b) {
-                map.clear();
-
                 bikes = b;
 
                 listAdapter = new BikeAdapter(listView.getContext(), bikes);
                 listView.setAdapter(listAdapter);
-
-                addMarkers();
             }
         }.execute();
-
-        //API.getBikes(callback);
     }
 
     public void onCreate() {
         mapFragment.getMapAsync(this);
+        scheduleUpdates();
+    }
+
+    private void scheduleUpdates() {
+        final Handler handler = new Handler();
+        Timer timer = new Timer();
+
+        TimerTask timerTask = new TimerTask() {
+            @Override
+            public void run() {
+                handler.post(new Runnable() {
+                    @Override
+                    public void run() {
+                        new GetBikesTask() {
+                            @Override
+                            protected void onPostExecute(ArrayList<Bike> b) {
+                                map.clear();
+
+                                bikes = b;
+
+                                addMarkers();
+
+                                Log.d("wax", "updated map");
+                            }
+                        }.execute();
+                    }
+                });
+            }
+        };
+
+        timer.scheduleAtFixedRate(timerTask, UPDATE_INTERVAL, UPDATE_INTERVAL);
     }
 
     @Override
