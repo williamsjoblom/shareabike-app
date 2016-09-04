@@ -9,6 +9,8 @@ import android.widget.ListView;
 import com.google.android.gms.maps.SupportMapFragment;
 import com.sothree.slidinguppanel.SlidingUpPanelLayout;
 
+import se.emilsjolander.stickylistheaders.StickyListHeadersListView;
+
 public class MainActivity extends AppCompatActivity {
 
     public static final int USER_ID = 1; // ERIK!
@@ -29,7 +31,7 @@ public class MainActivity extends AppCompatActivity {
         SlidingUpPanelLayout slide = (SlidingUpPanelLayout)  findViewById(R.id.sliding_layout);
         SupportMapFragment mapFragment = (SupportMapFragment) getSupportFragmentManager()
                 .findFragmentById(R.id.map);
-        ListView bikeList = (ListView) findViewById(R.id.bike_list);
+        StickyListHeadersListView bikeList = (StickyListHeadersListView) findViewById(R.id.bike_list);
 
         bikeViewManager = new BikeViewManager(this, slide, mapFragment, bikeList);
         bikeViewManager.onCreate();

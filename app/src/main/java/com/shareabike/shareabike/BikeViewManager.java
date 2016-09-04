@@ -34,6 +34,8 @@ import java.util.ArrayList;
 import java.util.Timer;
 import java.util.TimerTask;
 
+import se.emilsjolander.stickylistheaders.StickyListHeadersListView;
+
 /**
  * Created by wax on 9/3/16.
  */
@@ -45,7 +47,7 @@ public class BikeViewManager implements OnMapReadyCallback, OnBikesCallback, Ada
     private Activity context;
 
     private SupportMapFragment mapFragment;
-    final private ListView listView;
+    final private StickyListHeadersListView listView;
     private SlidingUpPanelLayout slide;
 
     private GoogleMap map;
@@ -54,12 +56,15 @@ public class BikeViewManager implements OnMapReadyCallback, OnBikesCallback, Ada
     private BikeAdapter listAdapter;
     private ArrayList<Marker> bikeMarkers;
 
-    public BikeViewManager(Activity context, SlidingUpPanelLayout s, SupportMapFragment mf, ListView l) {
+    public BikeViewManager(Activity context, SlidingUpPanelLayout s, SupportMapFragment mf, StickyListHeadersListView l) {
         this.context = context;
 
         this.mapFragment = mf;
         this.listView = l;
         this.slide = s;
+
+        //s.setScrollableView(l);
+        s.setDragView(context.findViewById(R.id.drag_view));
 
         listView.setOnItemClickListener(this);
 
@@ -203,8 +208,7 @@ public class BikeViewManager implements OnMapReadyCallback, OnBikesCallback, Ada
 
     @Override
     public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-        if (map == null) return;
-        Bike bike = bikes.get(position);
+        Bike bike = bikes.get(listView.getHeaderOverlap(position));
         startBikeActivity(bike);
     }
 

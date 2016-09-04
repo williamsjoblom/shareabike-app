@@ -52,7 +52,7 @@
                 android:fontFamily="sans-serif"
                 android:textColor="@android:color/secondary_text_light"
                 android:text="Small Text"
-                android:id="@+id/bikeDistanceText1" />
+                android:id="@+id/bike_owner_text" />
 
 
     </LinearLayout>

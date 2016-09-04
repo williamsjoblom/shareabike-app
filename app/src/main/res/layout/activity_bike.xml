@@ -2,15 +2,14 @@
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:orientation="vertical"
     android:layout_width="match_parent"
-    android:layout_height="match_parent"
-    >
+    android:layout_height="match_parent">
 
     <ImageView
         android:layout_width="match_parent"
         android:layout_height="250dp"
         android:id="@+id/dialog_image"
         android:layout_gravity="center_horizontal"
-        android:scaleType="centerCrop" />
+        android:scaleType="centerCrop"/>
 
     <LinearLayout
         android:layout_width="match_parent"
@@ -18,7 +17,8 @@
         android:paddingRight="8dp"
         android:paddingLeft="8dp"
         android:paddingTop="4dp"
-        android:paddingBottom="8dp">
+        android:paddingBottom="8dp"
+        android:orientation="vertical">
 
         <TextView
             android:layout_width="match_parent"
@@ -27,8 +27,14 @@
             android:textSize="22dp"
             android:textColor="@android:color/secondary_text_light"
             android:fontFamily="sans-serif"
-
             android:id="@+id/bike_name"/>
+
+        <TextView
+            android:id="@+id/bike_owner_text"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="Anders Andersson"
+            android:textSize="16dp" />
 
     </LinearLayout>
 

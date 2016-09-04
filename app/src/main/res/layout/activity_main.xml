@@ -7,6 +7,7 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:gravity="bottom"
+    android:background="@android:color/background_light"
     sothree:umanoPanelHeight="50dp"
     sothree:umanoShadowHeight="2dp">
 
@@ -23,6 +24,7 @@
             class="com.google.android.gms.maps.SupportMapFragment"/>
 
     </LinearLayout>
+
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="match_parent"
@@ -74,9 +76,10 @@
                     android:id="@+id/clear_selected_bike"/>
 
             </LinearLayout>
-
         </LinearLayout>
+
         <LinearLayout
+            android:id="@+id/drag_view"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:orientation="horizontal"
@@ -91,16 +94,17 @@
                 android:fontFamily="sans-serif"
                 android:textSize="16dp"
                 android:layout_marginLeft="16dp"
-                android:text="NEARBY BIKES"
+                android:text="LIST"
                 android:textColor="@android:color/tertiary_text_light"/>
         </LinearLayout>
 
-        <ListView
+        <se.emilsjolander.stickylistheaders.StickyListHeadersListView
             android:id="@+id/bike_list"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:divider="@null"
-            android:dividerHeight="0dp" />
+            android:dividerHeight="0dp"
+            android:background="@android:color/background_light"/>
 
     </LinearLayout>
 

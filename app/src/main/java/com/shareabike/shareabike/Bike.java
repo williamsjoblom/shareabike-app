@@ -20,10 +20,16 @@ import java.util.ArrayList;
  */
 public class Bike implements Serializable {
 
+    public static final int RENTED = 0;
+    public static final int OWNED = 1;
+    public static final int NEARBY = 2;
+    public static final int OCCUPIED = 3;
+
     private int id;
     private int owner;
     private int rentedBy;
     private String name;
+    private String ownerName;
     private String imageURL;
     private ArrayList<Location> locations;
     private Marker marker;
@@ -36,6 +42,7 @@ public class Bike implements Serializable {
             id = o.getInt("id");
             name = o.getString("bike_name");
             owner = o.getInt("owner");
+            ownerName = o.getString("full_name");
             imageURL = o.getString("image_url");
 
             Object re = o.get("rented_by");
@@ -61,6 +68,31 @@ public class Bike implements Serializable {
         }
     }
 
+    public int getHeaderId() {
+        if(isMyBike()) return OWNED;
+        if(isMyRentedBike()) return RENTED;
+        if(isAvailable()) return NEARBY;
+        if(isOccupied()) return OCCUPIED;
+
+        return OCCUPIED;
+    }
+
+    public boolean isMyBike() {
+        return owner == MainActivity.USER_ID;
+    }
+
+    public boolean isMyRentedBike() {
+        return rentedBy == MainActivity.USER_ID;
+    }
+
+    public boolean isAvailable() {
+        return rentedBy == 0;
+    }
+
+    public boolean isOccupied() {
+        return !isAvailable() && !isMyBike() && !isMyRentedBike();
+    }
+
     public void setMarker(Marker marker) {
         this.marker = marker;
     }
@@ -76,6 +108,8 @@ public class Bike implements Serializable {
     public int getID() { return id; }
 
     public String getImageURL() { return imageURL; }
+
+    public String getOwnerName() { return ownerName; }
 
     public float getDistance() {
         GPSManager manager = GPSManager.getInstance();

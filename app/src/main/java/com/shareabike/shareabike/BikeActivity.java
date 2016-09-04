@@ -65,9 +65,12 @@ public class BikeActivity extends AppCompatActivity {
                         new GetBorrowedTask(MainActivity.USER_ID) {
                             @Override
                             protected void onPostExecute(Integer result) {
-                                setButtonBorrow(borrowButton);
-                                if(result > 0)
+                                if(result > 0) {
+                                    borrowButton.setText("You can't borrow more than one bike!");
                                     setButtonDisabled(borrowButton);
+                                } else {
+                                    setButtonBorrow(borrowButton);
+                                }
                             }
                         }.execute();
                     }
