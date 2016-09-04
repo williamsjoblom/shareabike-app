@@ -1,6 +1,7 @@
 package com.shareabike.shareabike.API;
 
 import com.shareabike.shareabike.Bike;
+import com.shareabike.shareabike.MainActivity;
 import com.shareabike.shareabike.User;
 
 import org.json.JSONException;
@@ -19,7 +20,7 @@ public abstract class GetBorrowedTask extends NiceAsyncTask<Void, Integer> {
 
     @Override
     protected Integer doInBackground(Object... params) {
-        String data = API.read("bikeBorrowing/" + userID);
+        String data = API.read("bikeBorrowing/" + MainActivity.USER_ID);
 
         if(data.equals("false"))
             return -1;

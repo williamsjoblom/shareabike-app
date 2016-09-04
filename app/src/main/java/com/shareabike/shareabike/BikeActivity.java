@@ -20,13 +20,10 @@ import com.shareabike.shareabike.API.GetBorrowedTask;
 import com.shareabike.shareabike.API.LockTask;
 import com.squareup.picasso.Picasso;
 
-import org.w3c.dom.Text;
-
 public class BikeActivity extends AppCompatActivity {
+    
     private int id;
     private Bike bike;
-
-
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {

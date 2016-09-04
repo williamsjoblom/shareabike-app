@@ -9,6 +9,7 @@ import android.widget.ArrayAdapter;
 import android.widget.ImageView;
 import android.widget.TextView;
 
+import com.shareabike.shareabike.API.GetBikeTask;
 import com.squareup.picasso.Picasso;
 
 import java.util.ArrayList;
@@ -21,8 +22,11 @@ import se.emilsjolander.stickylistheaders.StickyListHeadersAdapter;
  */
 public class BikeAdapter extends ArrayAdapter<Bike> implements StickyListHeadersAdapter {
 
+    final ArrayList<Bike> bikes;
+
     public BikeAdapter(Context context, ArrayList<Bike> bikes) {
         super(context, 0, bikes);
+        this.bikes = bikes;
     }
 
     @Override
@@ -63,6 +67,28 @@ public class BikeAdapter extends ArrayAdapter<Bike> implements StickyListHeaders
     public long getHeaderId(int position) {
         Bike b = getItem(position);
         return b.getHeaderId();
+    }
+
+    public void updateBike(Bike bike) {
+
+        int index = 0;
+
+        for(int i = 0; i < getCount(); i++) {
+            if(bike.getID() == getItem(i).getID())
+                index = i;
+        }
+
+        final int i = index;
+
+        new GetBikeTask(bike.getID()) {
+            @Override
+            protected void onPostExecute(Bike bike) {
+                bikes.set(i, bike);
+                notifyDataSetChanged();
+            }
+        }.execute();
+
+
     }
 
     public String getHeaderTitle(int position) {
