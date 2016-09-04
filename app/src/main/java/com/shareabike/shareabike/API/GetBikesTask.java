@@ -26,7 +26,7 @@ public abstract class GetBikesTask extends NiceAsyncTask<Void, ArrayList<Bike>> 
                 JSONObject o = jsonBikes.getJSONObject(i);
                 bikes.add(new Bike(o));
             }
-        } catch (JSONException e) {
+        } catch (Exception e) {
             Log.e("wax", "JSON err: " + e.toString());
         }
 

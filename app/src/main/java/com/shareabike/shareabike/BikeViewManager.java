@@ -7,6 +7,7 @@ import android.os.Handler;
 import android.util.Log;
 import android.view.View;
 import android.widget.AdapterView;
+import android.widget.Button;
 import android.widget.ListView;
 import android.widget.TextView;
 
@@ -16,12 +17,15 @@ import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.GoogleMap.OnMarkerClickListener;
 import com.google.android.gms.maps.OnMapReadyCallback;
 import com.google.android.gms.maps.SupportMapFragment;
+import com.google.android.gms.maps.model.BitmapDescriptorFactory;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.MarkerOptions;
 
 import com.google.android.gms.maps.model.PolylineOptions;
+import com.shareabike.shareabike.API.FindTask;
 import com.shareabike.shareabike.API.GetBikesTask;
+import com.shareabike.shareabike.API.GetPOITask;
 import com.shareabike.shareabike.API.OnBikesCallback;
 import com.sothree.slidinguppanel.SlidingUpPanelLayout;
 
@@ -48,6 +52,7 @@ public class BikeViewManager implements OnMapReadyCallback, OnBikesCallback, Ada
 
     private ArrayList<Bike> bikes;
     private BikeAdapter listAdapter;
+    private ArrayList<Marker> bikeMarkers;
 
     public BikeViewManager(Activity context, SlidingUpPanelLayout s, SupportMapFragment mf, ListView l) {
         this.context = context;
@@ -62,6 +67,8 @@ public class BikeViewManager implements OnMapReadyCallback, OnBikesCallback, Ada
             @Override
             protected void onPostExecute(ArrayList<Bike> b) {
                 bikes = b;
+
+                addMarkers();
 
                 listAdapter = new BikeAdapter(listView.getContext(), bikes);
                 listView.setAdapter(listAdapter);
@@ -87,7 +94,7 @@ public class BikeViewManager implements OnMapReadyCallback, OnBikesCallback, Ada
                         new GetBikesTask() {
                             @Override
                             protected void onPostExecute(ArrayList<Bike> b) {
-                                map.clear();
+                                clearBikeMarkers();
 
                                 bikes = b;
 
@@ -119,11 +126,12 @@ public class BikeViewManager implements OnMapReadyCallback, OnBikesCallback, Ada
         map.setMyLocationEnabled(true);
 
         addMarkers();
+        addPOIs();
     }
 
     @Override
     public void onBikes(ArrayList<Bike> bikes) {
-        map.clear();
+        clearBikeMarkers();
 
         this.bikes = bikes;
 
@@ -134,11 +142,21 @@ public class BikeViewManager implements OnMapReadyCallback, OnBikesCallback, Ada
     }
 
     private void addMarkers() {
+        bikeMarkers = new ArrayList<>();
+
         if (map == null || bikes == null)
             return;
 
         for (Bike bike : bikes) {
             addMarker(bike);
+        }
+    }
+
+    private void clearBikeMarkers() {
+        if (bikeMarkers == null) return;
+
+        for (Marker m : bikeMarkers) {
+            m.remove();
         }
     }
 
@@ -152,13 +170,35 @@ public class BikeViewManager implements OnMapReadyCallback, OnBikesCallback, Ada
 
         LatLng location = new LatLng(bike.getLat(), bike.getLong());
         MarkerOptions options = new MarkerOptions().position(location);
+        options.title(bike.getName());
 
         Marker marker = map.addMarker(options);
         marker.setTag(bike);
         bike.setMarker(marker);
 
+        bikeMarkers.add(marker);
+
         if(drawBikePath)
             drawPath(bike);
+    }
+
+    private void addPOIs() {
+        new GetPOITask() {
+            @Override
+            protected void onPostExecute(ArrayList<PointOfInterest> pointOfInterests) {
+                for(PointOfInterest poi : pointOfInterests) {
+                    MarkerOptions options = new MarkerOptions().position(poi.getPos());
+
+                    if(poi.getType() == PointOfInterest.Type.PUMP) {
+                        options.icon(BitmapDescriptorFactory.fromResource(R.drawable.pump24));
+                        options.title("Pump");
+                    }
+
+                    Marker marker = map.addMarker(options);
+                    Log.d("wax", "poi: " + poi.getPos().toString());
+                }
+            }
+        }.execute();
     }
 
     @Override
@@ -170,8 +210,13 @@ public class BikeViewManager implements OnMapReadyCallback, OnBikesCallback, Ada
 
     @Override
     public boolean onMarkerClick(Marker marker) {
-        Bike bike = (Bike)marker.getTag();
-        startBikeActivity(bike);
+        // Ugly way of cheking if this is a POI och bike marker.
+        // Bike markers has tag data.
+        if (marker.getTag() != null) {
+            Bike bike = (Bike) marker.getTag();
+            startBikeActivity(bike);
+            return true;
+        }
         return false;
     }
 
@@ -181,8 +226,8 @@ public class BikeViewManager implements OnMapReadyCallback, OnBikesCallback, Ada
         context.startActivity(intent);
     }
 
-    public void showOnMap(Bike bike) {
-        map.clear();
+    public void showOnMap(final Bike bike) {
+        clearBikeMarkers();
 
         addMarker(bike);
 
@@ -196,8 +241,21 @@ public class BikeViewManager implements OnMapReadyCallback, OnBikesCallback, Ada
         TextView selectedBikeText = (TextView) context.findViewById(R.id.selected_bike_text);
         selectedBikeText.setText(bike.getName());
 
+        Button findButton = (Button) context.findViewById(R.id.find_button);
+        findButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                new FindTask(bike.getID()).execute();
+            }
+        });
+
         slide.setPanelState(SlidingUpPanelLayout.PanelState.COLLAPSED);
         slide.setTouchEnabled(false);
+
+        if (bike.getRentedBy() == MainActivity.USER_ID || bike.getOwner() == MainActivity.USER_ID)
+            findButton.setVisibility(View.VISIBLE);
+        else
+            findButton.setVisibility(View.INVISIBLE);
 
         View clearSelected = context.findViewById(R.id.clear_selected_bike);
         clearSelected.setOnClickListener(new View.OnClickListener() {
@@ -229,7 +287,7 @@ public class BikeViewManager implements OnMapReadyCallback, OnBikesCallback, Ada
     }
 
     public void unShowOnMap() {
-        map.clear();
+        clearBikeMarkers();
 
         View view = context.findViewById(R.id.bike_selected_view);
         view.setVisibility(View.GONE);

@@ -5,6 +5,7 @@ import android.content.Intent;
 import android.support.v7.app.ActionBar;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
@@ -17,6 +18,8 @@ import com.shareabike.shareabike.API.BorrowTask;
 import com.shareabike.shareabike.API.GetBikeTask;
 import com.shareabike.shareabike.API.GetBorrowedTask;
 import com.squareup.picasso.Picasso;
+
+import org.w3c.dom.Text;
 
 public class BikeActivity extends AppCompatActivity {
     private int id;
@@ -52,6 +55,8 @@ public class BikeActivity extends AppCompatActivity {
                 if (bike.getOwner() != MainActivity.USER_ID) {
                     if (bike.getRentedBy() != 0 && bike.getRentedBy() != MainActivity.USER_ID) {
                         // Unavailable
+                        borrowButton.setText("Occupied");
+                        setButtonDisabled(borrowButton);
                     } else if (bike.getRentedBy() == MainActivity.USER_ID) {
                         // Borrowed
                         setButtonReturn(borrowButton);
@@ -62,11 +67,13 @@ public class BikeActivity extends AppCompatActivity {
                             protected void onPostExecute(Integer result) {
                                 setButtonBorrow(borrowButton);
                                 if(result > 0)
-                                    borrowButton.setEnabled(false);
+                                    setButtonDisabled(borrowButton);
                             }
                         }.execute();
                     }
-
+                } else {
+                    borrowButton.setText("You own this bike");
+                    setButtonDisabled(borrowButton);
                 }
             }
         }.execute();
@@ -82,8 +89,6 @@ public class BikeActivity extends AppCompatActivity {
                 setButtonReturn(borrowButton);
             }
         });
-
-        borrowButton.setVisibility(View.VISIBLE);
     }
 
     private void setButtonReturn(final Button borrowButton) {
@@ -96,8 +101,11 @@ public class BikeActivity extends AppCompatActivity {
                 setButtonBorrow(borrowButton);
             }
         });
+    }
 
-        borrowButton.setVisibility(View.VISIBLE);
+    private void setButtonDisabled(Button borrowButton) {
+        borrowButton.setAlpha(0.5f);
+        borrowButton.setEnabled(false);
     }
 
     @Override

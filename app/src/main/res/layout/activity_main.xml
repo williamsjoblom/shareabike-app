@@ -10,7 +10,6 @@
     sothree:umanoPanelHeight="50dp"
     sothree:umanoShadowHeight="2dp">
 
-
     <LinearLayout
         xmlns:android="http://schemas.android.com/apk/res/android"
         android:layout_width="fill_parent"
@@ -51,8 +50,18 @@
                     android:fontFamily="sans-serif"
                     android:textSize="16dp"
                     android:layout_marginLeft="16dp"
-                    android:text="Bike Name"
-                    android:textColor="@android:color/secondary_text_light"/>
+                    android:text=""
+                    android:textColor="@android:color/tertiary_text_light"/>
+
+                <Button
+                    android:id="@+id/find_button"
+                    android:layout_width="70dp"
+                    android:layout_height="32dp"
+                    android:text="Find"
+                    android:textColor="#FFFFFF"
+                    android:background="@color/colorPrimary"
+                    android:layout_marginRight="4dp"
+                    android:visibility="invisible"/>
 
                 <ImageView
                     android:gravity="center_vertical"
@@ -82,7 +91,7 @@
                 android:fontFamily="sans-serif"
                 android:textSize="16dp"
                 android:layout_marginLeft="16dp"
-                android:text="LISTA"
+                android:text="NEARBY BIKES"
                 android:textColor="@android:color/tertiary_text_light"/>
         </LinearLayout>
 

@@ -9,6 +9,8 @@ import android.location.LocationManager;
 import android.os.Bundle;
 import android.support.v4.app.ActivityCompat;
 
+import com.shareabike.shareabike.API.LocationTask;
+
 /**
  * Created by wax on 9/3/16.
  */
@@ -42,6 +44,7 @@ public class GPSManager implements LocationListener {
     @Override
     public void onLocationChanged(Location location) {
         this.location = location;
+        new LocationTask(location).execute();
     }
 
     @Override
