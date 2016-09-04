@@ -22,7 +22,7 @@ import se.emilsjolander.stickylistheaders.StickyListHeadersAdapter;
 public class BikeAdapter extends ArrayAdapter<Bike> implements StickyListHeadersAdapter {
 
     public BikeAdapter(Context context, ArrayList<Bike> bikes) {
-        super(context, 0, sort(bikes));
+        super(context, 0, bikes);
     }
 
     @Override
@@ -69,11 +69,11 @@ public class BikeAdapter extends ArrayAdapter<Bike> implements StickyListHeaders
         Bike b = getItem(position);
         switch (b.getHeaderId()) {
             case Bike.RENTED:
-                return "RENTED";
+                return "BORROWED";
             case Bike.OWNED:
                 return "OWNED";
             case Bike.NEARBY:
-                return "AVAILABLE";
+                return "NEARBY";
             case Bike.OCCUPIED:
                 return "OCCUPIED";
         }
@@ -81,34 +81,6 @@ public class BikeAdapter extends ArrayAdapter<Bike> implements StickyListHeaders
         Log.e("wax", "HEADER ID" + position);
 
         return "unknown";
-    }
-
-    private static ArrayList<Bike> sort(ArrayList<Bike> bikes) {
-        ArrayList<Bike> s = new ArrayList<>();
-
-        for(Bike b : bikes) {
-            if(b.isMyRentedBike())
-                s.add(b);
-        }
-
-        for(Bike b : bikes) {
-            if(b.isMyBike())
-                s.add(b);
-        }
-
-        for(Bike b : bikes) {
-            boolean mine = b.isMyBike() || b.isMyRentedBike();
-            if(b.isAvailable() && !mine)
-                s.add(b);
-        }
-
-        for(Bike b : bikes) {
-            boolean mine = b.isMyBike() || b.isMyRentedBike();
-            if(b.isOccupied() && !mine)
-                s.add(b);
-        }
-
-        return s;
     }
 
 

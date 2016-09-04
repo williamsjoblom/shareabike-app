@@ -75,7 +75,7 @@ public class BikeViewManager implements OnMapReadyCallback, OnBikesCallback, Ada
 
                 addMarkers();
 
-                listAdapter = new BikeAdapter(listView.getContext(), bikes);
+                listAdapter = new BikeAdapter(listView.getContext(), sortBikes(bikes));
                 listView.setAdapter(listAdapter);
             }
         }.execute();
@@ -104,7 +104,6 @@ public class BikeViewManager implements OnMapReadyCallback, OnBikesCallback, Ada
                                 bikes = b;
 
                                 addMarkers();
-
                                 Log.d("wax", "updated map");
                             }
                         }.execute();
@@ -208,7 +207,7 @@ public class BikeViewManager implements OnMapReadyCallback, OnBikesCallback, Ada
 
     @Override
     public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-        Bike bike = bikes.get(listView.getHeaderOverlap(position));
+        Bike bike = listAdapter.getItem(position);
         startBikeActivity(bike);
     }
 
@@ -221,6 +220,7 @@ public class BikeViewManager implements OnMapReadyCallback, OnBikesCallback, Ada
             startBikeActivity(bike);
             return true;
         }
+
         return false;
     }
 
@@ -298,5 +298,33 @@ public class BikeViewManager implements OnMapReadyCallback, OnBikesCallback, Ada
         slide.setTouchEnabled(true);
 
         addMarkers();
+    }
+
+    private static ArrayList<Bike> sortBikes(ArrayList<Bike> bikes) {
+        ArrayList<Bike> s = new ArrayList<>();
+
+        for(Bike b : bikes) {
+            if(b.isMyRentedBike())
+                s.add(b);
+        }
+
+        for(Bike b : bikes) {
+            if(b.isMyBike())
+                s.add(b);
+        }
+
+        for(Bike b : bikes) {
+            boolean mine = b.isMyBike() || b.isMyRentedBike();
+            if(b.isAvailable() && !mine)
+                s.add(b);
+        }
+
+        for(Bike b : bikes) {
+            boolean mine = b.isMyBike() || b.isMyRentedBike();
+            if(b.isOccupied() && !mine)
+                s.add(b);
+        }
+
+        return s;
     }
 }

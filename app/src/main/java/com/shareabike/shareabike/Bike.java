@@ -35,6 +35,10 @@ public class Bike implements Serializable {
     private Marker marker;
 
 
+
+    private boolean locked;
+
+
     public Bike(JSONObject o) {
         locations = new ArrayList<>();
 
@@ -44,6 +48,7 @@ public class Bike implements Serializable {
             owner = o.getInt("owner");
             ownerName = o.getString("full_name");
             imageURL = o.getString("image_url");
+            locked = o.getBoolean("locked");
 
             Object re = o.get("rented_by");
 
@@ -137,6 +142,15 @@ public class Bike implements Serializable {
             return 0;
 
         return locations.get(0).getLongitude();
+    }
+
+
+    public boolean isLocked() {
+        return locked;
+    }
+
+    public void setLocked(boolean v) {
+        locked = v;
     }
 
     public int getRentedBy() { return rentedBy; }
