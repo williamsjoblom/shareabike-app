@@ -14,6 +14,7 @@ import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.TextView;
 
+import com.shareabike.shareabike.API.API;
 import com.shareabike.shareabike.API.BorrowTask;
 import com.shareabike.shareabike.API.GetBikeTask;
 import com.shareabike.shareabike.API.GetBorrowedTask;
@@ -48,7 +49,7 @@ public class BikeActivity extends AppCompatActivity {
 
                 nameText.setText(bike.getName());
                 if (!bike.getImageURL().isEmpty())
-                    Picasso.with(context).load(bike.getImageURL()).into(imageView);
+                    Picasso.with(context).load(API.SERVER_URL + bike.getImageURL()).into(imageView);
 
                 final Button borrowButton = (Button) findViewById(R.id.borrow_button);
                 final Button lockButton = (Button) findViewById(R.id.lock_button);

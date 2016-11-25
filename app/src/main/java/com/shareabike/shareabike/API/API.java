@@ -17,7 +17,8 @@ import java.util.ArrayList;
  * Created by wax on 9/3/16.
  */
 public class API {
-    private final static String API_URL = "http://138.68.129.101/api/";
+    public final static String SERVER_URL = "http://138.68.147.88/";
+    private final static String API_URL = SERVER_URL + "api/";
 
     private static API instance;
 
@@ -44,7 +45,7 @@ public class API {
             in.close();
             return builder.toString();
         } catch (Exception ex) {
-            Log.e("wax", "API read error");
+            Log.e("wax", "API read error: " + ex.toString());
         }
 
         return null;

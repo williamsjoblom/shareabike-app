@@ -9,6 +9,7 @@ import android.widget.ArrayAdapter;
 import android.widget.ImageView;
 import android.widget.TextView;
 
+import com.shareabike.shareabike.API.API;
 import com.shareabike.shareabike.API.GetBikeTask;
 import com.squareup.picasso.Picasso;
 
@@ -47,7 +48,7 @@ public class BikeAdapter extends ArrayAdapter<Bike> implements StickyListHeaders
         ownerText.setText(bike.getOwnerName());
 
         if (!bike.getImageURL().isEmpty())
-            Picasso.with(this.getContext()).load(bike.getImageURL()).into(bikeImage);
+            Picasso.with(this.getContext()).load(API.SERVER_URL + bike.getImageURL()).into(bikeImage);
 
         return convertView;
     }

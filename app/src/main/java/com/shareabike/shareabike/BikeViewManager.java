@@ -22,6 +22,7 @@ import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.MarkerOptions;
 
+import com.google.android.gms.maps.model.Polyline;
 import com.google.android.gms.maps.model.PolylineOptions;
 import com.shareabike.shareabike.API.FindTask;
 import com.shareabike.shareabike.API.GetBikesTask;
@@ -51,10 +52,12 @@ public class BikeViewManager implements OnMapReadyCallback, OnBikesCallback, Ada
     private SlidingUpPanelLayout slide;
 
     private GoogleMap map;
+    private boolean gpsReady = false;
 
     private ArrayList<Bike> bikes;
     private BikeAdapter listAdapter;
     private ArrayList<Marker> bikeMarkers;
+    private ArrayList<Polyline> bikePaths;
 
     public BikeViewManager(Activity context, SlidingUpPanelLayout s, SupportMapFragment mf, StickyListHeadersListView l) {
         this.context = context;
@@ -62,6 +65,8 @@ public class BikeViewManager implements OnMapReadyCallback, OnBikesCallback, Ada
         this.mapFragment = mf;
         this.listView = l;
         this.slide = s;
+
+        this.bikePaths = new ArrayList<>();
 
         //s.setScrollableView(l);
         s.setDragView(context.findViewById(R.id.drag_view));
@@ -104,7 +109,7 @@ public class BikeViewManager implements OnMapReadyCallback, OnBikesCallback, Ada
                                 bikes = b;
 
                                 addMarkers();
-                                Log.d("wax", "updated map");
+                                //Log.d("wax", "Map updated");
                             }
                         }.execute();
                     }
@@ -118,19 +123,27 @@ public class BikeViewManager implements OnMapReadyCallback, OnBikesCallback, Ada
     @Override
     public void onMapReady(GoogleMap googleMap) {
         map = googleMap;
+        if (gpsReady) signalGpsReady();
 
-        map.setMinZoomPreference(11);
+        //map.setMinZoomPreference(11);
         map.setOnMarkerClickListener(this);
 
-        Location l = GPSManager.getInstance().getLocation();
-        LatLng latlng = new LatLng(l.getLatitude(), l.getLongitude());
-        CameraUpdate update = CameraUpdateFactory.newLatLngZoom(latlng, FOCUS_ZOOM);
-        map.moveCamera(update);
-
-        map.setMyLocationEnabled(true);
+        if (Permission.checkGPS(context))
+            map.setMyLocationEnabled(true);
 
         addMarkers();
         addPOIs();
+    }
+
+    public void signalGpsReady() {
+        gpsReady = true;
+
+        if (map != null) {
+            Location l = GPSManager.getInstance().getLocation();
+            LatLng latlng = new LatLng(l.getLatitude(), l.getLongitude());
+            CameraUpdate update = CameraUpdateFactory.newLatLngZoom(latlng, FOCUS_ZOOM);
+            map.moveCamera(update);
+        }
     }
 
     @Override
@@ -164,6 +177,12 @@ public class BikeViewManager implements OnMapReadyCallback, OnBikesCallback, Ada
         }
     }
 
+    private void clearBikePaths() {
+        for(Polyline path : bikePaths) {
+            path.remove();
+        }
+    }
+
     private void addMarker(Bike bike) {
         addMarker(bike, false);
     }
@@ -194,7 +213,7 @@ public class BikeViewManager implements OnMapReadyCallback, OnBikesCallback, Ada
                     MarkerOptions options = new MarkerOptions().position(poi.getPos());
 
                     if(poi.getType() == PointOfInterest.Type.PUMP) {
-                        options.icon(BitmapDescriptorFactory.fromResource(R.drawable.pump24));
+                        options.icon(BitmapDescriptorFactory.fromResource(R.mipmap.ic_launcher));
                         options.title("Pump");
                     }
 
@@ -213,7 +232,7 @@ public class BikeViewManager implements OnMapReadyCallback, OnBikesCallback, Ada
 
     @Override
     public boolean onMarkerClick(Marker marker) {
-        // Ugly way of cheking if this is a POI och bike marker.
+        // Ugly way of cheking if this is a POI or bike marker.
         // Bike markers has tag data.
         if (marker.getTag() != null) {
             Bike bike = (Bike) marker.getTag();
@@ -232,8 +251,10 @@ public class BikeViewManager implements OnMapReadyCallback, OnBikesCallback, Ada
 
     public void showOnMap(final Bike bike) {
         clearBikeMarkers();
+        clearBikePaths();
 
         addMarker(bike);
+        drawPath(bike);
 
         LatLng latlng = new LatLng(bike.getLat(), bike.getLong());
         CameraUpdate update = CameraUpdateFactory.newLatLngZoom(latlng, FOCUS_ZOOM);
@@ -273,9 +294,8 @@ public class BikeViewManager implements OnMapReadyCallback, OnBikesCallback, Ada
     public void drawPath(Bike bike) {
         ArrayList<Location> locations = bike.getLocations();
 
-        if(locations.size() < 2) return;
-
         PolylineOptions line = new PolylineOptions();
+        if(locations.size() < 2) return;
 
         LatLng p0 = new LatLng(locations.get(0).getLatitude(), locations.get(0).getLongitude());
 
@@ -287,11 +307,12 @@ public class BikeViewManager implements OnMapReadyCallback, OnBikesCallback, Ada
             p0 = p1;
         }
 
-        map.addPolyline(line);
+        bikePaths.add(map.addPolyline(line));
     }
 
     public void unShowOnMap() {
         clearBikeMarkers();
+        clearBikePaths();
 
         View view = context.findViewById(R.id.bike_selected_view);
         view.setVisibility(View.GONE);

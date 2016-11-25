@@ -34,12 +34,14 @@ public class Bike implements Serializable {
     private ArrayList<Location> locations;
     private Marker marker;
 
-
-
     private boolean locked;
 
 
     public Bike(JSONObject o) {
+        update(o);
+    }
+
+    public void update(JSONObject o) {
         locations = new ArrayList<>();
 
         try {
@@ -69,7 +71,7 @@ public class Bike implements Serializable {
                 locations.add(location);
             }
         } catch (JSONException e) {
-            Log.e("wax", "JSON error!!! " + e.toString());
+            Log.e("wax", "Error parsing bike JSON: " + e.toString());
         }
     }
 
@@ -78,7 +80,6 @@ public class Bike implements Serializable {
         if(isMyRentedBike()) return RENTED;
         if(isAvailable()) return NEARBY;
         if(isOccupied()) return OCCUPIED;
-
         return OCCUPIED;
     }
 
@@ -118,10 +119,15 @@ public class Bike implements Serializable {
 
     public float getDistance() {
         GPSManager manager = GPSManager.getInstance();
+
+        Location l = manager.getLocation();
+        if (l == null) return Float.POSITIVE_INFINITY;
+
         return manager.getLocation().distanceTo(getLocation());
     }
 
     public Location getLocation() {
+        //FIXME: This is sooo wrong!!!!
         if (locations.isEmpty())
             return new Location(LocationManager.GPS_PROVIDER);
 
