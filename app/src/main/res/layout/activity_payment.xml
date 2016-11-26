@@ -1,0 +1,79 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical"
+    android:padding="12dp">
+
+    <TextView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="Return &amp; Pay"
+        android:textSize="60sp"
+        android:textColor="@android:color/primary_text_light"
+        android:fontFamily="sans-serif-thin"
+        />
+
+
+    <TextView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:fontFamily="sans-serif"
+        android:textColor="@android:color/tertiary_text_light"
+        android:text="Total"
+        android:textSize="@dimen/bike_activity_secondary_text_size" />
+
+    <LinearLayout
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal">
+
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="4."
+            android:textSize="50sp"
+            android:textColor="@android:color/primary_text_light"
+            android:fontFamily="sans-serif-thin"
+            />
+
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="00"
+            android:textSize="26sp"
+            android:textColor="@android:color/secondary_text_light"
+            android:fontFamily="sans-serif-thin"
+            />
+
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text=" €"
+            android:textStyle=""
+            android:textSize="50sp"
+            android:textColor="@android:color/secondary_text_light"
+            android:fontFamily="sans-serif-thin"
+            />
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:fontFamily="sans-serif"
+            android:textColor="@android:color/tertiary_text_light"
+            android:text="to Erik Örjehag"
+            android:layout_marginLeft="16dp"
+            android:textSize="@dimen/bike_activity_secondary_text_size" />
+
+    </LinearLayout>
+
+
+    <ImageButton
+        android:layout_width="match_parent"
+        android:layout_height="48dp"
+        android:src="@drawable/mobilepayment"
+        android:scaleType="fitCenter"
+        android:layout_alignParentTop="true"
+        android:layout_alignParentStart="true"
+        android:background="@drawable/mobiilimaksu_button"
+        android:id="@+id/imageButton" />
+</LinearLayout>

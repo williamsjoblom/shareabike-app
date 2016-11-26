@@ -1,4 +1,12 @@
 <resources>
     <string name="app_name">Share a Bike</string>
     <string name="title_activity_maps">Map</string>
+
+    <string name="lorem_ipsum">
+        Lorem ipsum dolor sit amet, consectetur adipiscing elit. Aenean vehicula, tortor eget tristique egestas, sem odio porttitor quam, ac imperdiet ante mi sed purus. Morbi rutrum urna a mattis condimentum. Morbi orci est, molestie et tincidunt nec, hendrerit faucibus diam. Praesent et erat quis tellus varius eleifend. Sed ut velit pretium, vestibulum arcu nec, tristique neque. Maecenas non felis finibus, dictum sem ut, auctor risus. Fusce viverra interdum tortor, ut pellentesque est aliquet id. Vestibulum ac neque nisi. Praesent luctus nibh ut est mattis, vel sodales ligula luctus.
+
+Suspendisse gravida sem ex, sed porttitor ex maximus non. Etiam rutrum mi eu velit malesuada, ut luctus ante porta. Vivamus sit amet risus mi. Etiam malesuada quis eros sed tempor. Integer sapien augue, venenatis et justo nec, volutpat laoreet lectus. Vivamus id elit mi. Nullam nec lorem sed tortor elementum lacinia.
+
+Pellentesque mattis nibh eu eros efficitur pellentesque. Proin tristique dui tellus, quis tempus eros laoreet eget. Donec finibus risus sagittis mi molestie rutrum. Nulla suscipit mi pretium ultrices maximus. Sed a felis justo. Vivamus vel risus finibus, aliquet lacus ac, luctus sem. Fusce elementum molestie vehicula. Nullam porta tincidunt feugiat.
+    </string>
 </resources>

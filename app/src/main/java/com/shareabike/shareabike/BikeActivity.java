@@ -2,9 +2,14 @@ package com.shareabike.shareabike;
 
 import android.app.Activity;
 import android.content.Intent;
+import android.graphics.Color;
+import android.graphics.drawable.ColorDrawable;
+import android.support.design.widget.CollapsingToolbarLayout;
+import android.support.v4.view.ViewCompat;
 import android.support.v7.app.ActionBar;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+import android.support.v7.widget.Toolbar;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuInflater;
@@ -14,6 +19,7 @@ import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.TextView;
 
+import com.google.android.gms.maps.model.LatLng;
 import com.shareabike.shareabike.API.API;
 import com.shareabike.shareabike.API.BorrowTask;
 import com.shareabike.shareabike.API.GetBikeTask;
@@ -30,12 +36,20 @@ public class BikeActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_bike);
+        //getWindow().setStatusBarColor(R.color.colorPrimaryDark);
 
-        ActionBar actionBar = getSupportActionBar();
+        //ViewCompat.setTransitionName(findViewById(R.id.app_bar_layout), );
+
+        CollapsingToolbarLayout collapsingLayout = (CollapsingToolbarLayout) findViewById(R.id.main_collapsing);
+        collapsingLayout.setContentScrimResource(R.color.colorPrimary);
+
+        setSupportActionBar((Toolbar) findViewById(R.id.bike_toolbar));
+        final ActionBar actionBar = getSupportActionBar();
         actionBar.setDisplayHomeAsUpEnabled(true);
+        actionBar.setTitle("");
 
         Intent intent = getIntent();
-        id = intent.getIntExtra("id", 0);
+        id = intent.getIntExtra("id", -1);
 
         //////// UGLY CODE AHEAD, BEWARE!!!!
         final Activity context = this;
@@ -45,9 +59,10 @@ public class BikeActivity extends AppCompatActivity {
                 bike = b;
 
                 ImageView imageView = (ImageView) findViewById(R.id.dialog_image);
-                TextView nameText = (TextView) findViewById(R.id.bike_name);
+                TextView ownerText = (TextView) findViewById(R.id.bike_owner_text);
+                actionBar.setTitle(bike.getName());
+                ownerText.setText(bike.getOwnerName());
 
-                nameText.setText(bike.getName());
                 if (!bike.getImageURL().isEmpty())
                     Picasso.with(context).load(API.SERVER_URL + bike.getImageURL()).into(imageView);
 
@@ -73,19 +88,19 @@ public class BikeActivity extends AppCompatActivity {
                 else
                     lockButton.setText("Lock");
 
-                if (bike.getOwner() != MainActivity.USER_ID) {
-                    if (bike.getRentedBy() != 0 && bike.getRentedBy() != MainActivity.USER_ID) {
+                if (bike.getOwner() != MainActivity.userId) {
+                    if (bike.getRentedBy() != 0 && bike.getRentedBy() != MainActivity.userId) {
                         // Unavailable
                         borrowButton.setVisibility(View.VISIBLE);
                         borrowButton.setText("Occupied");
                         setButtonDisabled(borrowButton);
-                    } else if (bike.getRentedBy() == MainActivity.USER_ID) {
+                    } else if (bike.getRentedBy() == MainActivity.userId) {
                         // The bike is borrowed to you!
                         borrowButton.setVisibility(View.VISIBLE);
                         setButtonReturn(borrowButton, lockButton);
                     } else {
                         // Available
-                        new GetBorrowedTask(MainActivity.USER_ID) {
+                        new GetBorrowedTask(MainActivity.userId) {
                             @Override
                             protected void onPostExecute(Integer result) {
                                 borrowButton.setVisibility(View.VISIBLE);
@@ -119,7 +134,7 @@ public class BikeActivity extends AppCompatActivity {
         borrowButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                new BorrowTask(MainActivity.USER_ID, bike.getID(), true).execute();
+                new BorrowTask(MainActivity.userId, bike.getID(), true).execute();
                 setButtonReturn(borrowButton, lockButton);
             }
         });
@@ -133,7 +148,7 @@ public class BikeActivity extends AppCompatActivity {
         borrowButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                new BorrowTask(MainActivity.USER_ID, bike.getID(), false).execute();
+                new BorrowTask(MainActivity.userId, bike.getID(), false).execute();
                 setButtonBorrow(borrowButton, lockButton);
             }
         });
@@ -152,7 +167,7 @@ public class BikeActivity extends AppCompatActivity {
                 return true;
             case R.id.show_on_map:
                 if (bike == null) return false;
-                MainActivity.getBikeViewManager().showOnMap(bike);
+                BikeViewManager.getInstance().showOnMap(bike);
                 this.finish();
                 return true;
             default:

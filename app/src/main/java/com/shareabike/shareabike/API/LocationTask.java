@@ -18,7 +18,7 @@ public class LocationTask extends NiceAsyncTask<Void, Void> {
     @Override
     protected Void doInBackground(Object... params) {
         //"http://138.68.129.101/api/user/1/report/58.394628,15.560919"
-        API.read("user/" + MainActivity.USER_ID + "/report/" + location.getLatitude() + "," +
+        API.read("user/" + MainActivity.userId + "/report/" + location.getLatitude() + "," +
                 location.getLongitude());
         return null;
     }

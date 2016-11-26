@@ -20,7 +20,7 @@ public abstract class GetBorrowedTask extends NiceAsyncTask<Void, Integer> {
 
     @Override
     protected Integer doInBackground(Object... params) {
-        String data = API.read("bikeBorrowing/" + MainActivity.USER_ID);
+        String data = API.read("bikeBorrowing/" + MainActivity.userId);
 
         if(data.equals("false"))
             return -1;

@@ -71,7 +71,6 @@ public class BikeAdapter extends ArrayAdapter<Bike> implements StickyListHeaders
     }
 
     public void updateBike(Bike bike) {
-
         int index = 0;
 
         for(int i = 0; i < getCount(); i++) {

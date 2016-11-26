@@ -84,11 +84,11 @@ public class Bike implements Serializable {
     }
 
     public boolean isMyBike() {
-        return owner == MainActivity.USER_ID;
+        return owner == MainActivity.userId;
     }
 
     public boolean isMyRentedBike() {
-        return rentedBy == MainActivity.USER_ID;
+        return rentedBy == MainActivity.userId;
     }
 
     public boolean isAvailable() {

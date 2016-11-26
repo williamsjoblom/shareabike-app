@@ -59,7 +59,19 @@ public class BikeViewManager implements OnMapReadyCallback, OnBikesCallback, Ada
     private ArrayList<Marker> bikeMarkers;
     private ArrayList<Polyline> bikePaths;
 
-    public BikeViewManager(Activity context, SlidingUpPanelLayout s, SupportMapFragment mf, StickyListHeadersListView l) {
+    private static BikeViewManager instance;
+
+    public static BikeViewManager getInstance(Activity context, SlidingUpPanelLayout s, SupportMapFragment mf, StickyListHeadersListView l) {
+        if(instance == null)
+            instance = new BikeViewManager(context, s, mf, l);
+        return instance;
+    }
+
+    public static BikeViewManager getInstance() {
+        return instance;
+    }
+
+    private BikeViewManager(Activity context, SlidingUpPanelLayout s, SupportMapFragment mf, StickyListHeadersListView l) {
         this.context = context;
 
         this.mapFragment = mf;
@@ -105,9 +117,7 @@ public class BikeViewManager implements OnMapReadyCallback, OnBikesCallback, Ada
                             @Override
                             protected void onPostExecute(ArrayList<Bike> b) {
                                 clearBikeMarkers();
-
                                 bikes = b;
-
                                 addMarkers();
                                 //Log.d("wax", "Map updated");
                             }
@@ -217,9 +227,10 @@ public class BikeViewManager implements OnMapReadyCallback, OnBikesCallback, Ada
                         options.title("Pump");
                     }
 
-                    Marker marker = map.addMarker(options);
-                    Log.d("wax", "poi: " + poi.getPos().toString());
+                    map.addMarker(options);
                 }
+
+                Log.d("wax", "Added " + pointOfInterests.size() + " points of interest");
             }
         }.execute();
     }
@@ -277,7 +288,7 @@ public class BikeViewManager implements OnMapReadyCallback, OnBikesCallback, Ada
         slide.setPanelState(SlidingUpPanelLayout.PanelState.COLLAPSED);
         slide.setTouchEnabled(false);
 
-        if (bike.getRentedBy() == MainActivity.USER_ID || bike.getOwner() == MainActivity.USER_ID)
+        if (bike.getRentedBy() == MainActivity.userId || bike.getOwner() == MainActivity.userId)
             findButton.setVisibility(View.VISIBLE);
         else
             findButton.setVisibility(View.INVISIBLE);
